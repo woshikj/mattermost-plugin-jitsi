@@ -6,6 +6,9 @@ import Svgs from '../../constants/svgs';
 
 import {makeStyleFromTheme} from 'mattermost-redux/utils/theme_utils';
 
+//import {CopyToClipboard} from 'react-copy-to-clipboard';
+import CopyToClipboard = require("react-copy-to-clipboard");
+
 export type Props = {
     post?: Post,
     theme: any,
@@ -32,11 +35,11 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
     componentDidMount() {
         const {post} = this.props;
         if (post && post.props.jwt_meeting) {
-            this.props.actions.enrichMeetingJwt(post.props.meeting_jwt).then((response: any) => {
+            /*this.props.actions.enrichMeetingJwt(post.props.meeting_jwt).then((response: any) => {
                 if (response.data) {
                     this.setState({meetingJwt: response.data.jwt});
                 }
-            });
+            });*/
         }
     }
 
@@ -54,11 +57,14 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
 
         if (props.jwt_meeting) {
             const date = new Date(props.jwt_meeting_valid_until * 1000);
+            var expired = false;
             let dateStr = props.jwt_meeting_valid_until;
             if (!isNaN(date.getTime())) {
                 dateStr = date.toString();
+                expired = (date.getTime() - Date.now()) < 0;
             }
-            return (<div style={style.validUntil}>{' Meeting link valid until: '} <b>{dateStr}</b></div>);
+            return expired  ?  (<div style={style.validUntil}>{' Meeting link valid until: '} <b>{'Expired'}</b></div>)
+                            : (<div style={style.validUntil}>{' Meeting link valid until: '} <b>{dateStr}</b></div>);
         }
         return null;
     }
@@ -73,21 +79,29 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
         const props = post.props;
 
         let meetingLink = props.meeting_link;
-        if (this.state.meetingJwt) {
+        let personalLink = props.meeting_link;
+        /*if (this.state.meetingJwt) {
             meetingLink += '?jwt=' + this.state.meetingJwt;
         } else if (props.jwt_meeting) {
             meetingLink += '?jwt=' + (props.meeting_jwt);
-        }
-        meetingLink += `#config.callDisplayName="${props.meeting_topic}"`;
+        }*/
+        /*let personalLink = props.meeting_raw_link;
+        if (personalLink && this.state.meetingJwt) {
+            personalLink += '?jwt=' + this.state.meetingJwt;
+        } else if (personalLink && props.jwt_meeting && props.meeting_jwt) {
+            personalLink += '?jwt=' + props.meeting_jwt;
+        }*/
+        if(props.meeting_topic)
+            meetingLink += `#config.callDisplayName="${props.meeting_topic}"`;
 
         const preText = `${this.props.creatorName} has started a meeting`;
 
-        let subtitle = 'Meeting ID: ';
+        let subtitle = 'Meeting Link: ';
         if (props.meeting_personal) {
             subtitle = 'Personal Meeting ID (PMI): ';
         }
 
-        let title = 'Jitsi Meeting';
+        let title = 'Video Conference';
         if (props.meeting_topic) {
             title = props.meeting_topic;
         }
@@ -109,7 +123,7 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
                                     onClick={this.openJitsiMeeting}
                                     href={meetingLink}
                                 >
-                                    {props.meeting_id}
+                                    {meetingLink || props.meeting_id}
                                 </a>
                             </span>
                             <div>
@@ -121,7 +135,7 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
                                             target='_blank'
                                             rel='noopener noreferrer'
                                             onClick={this.openJitsiMeeting}
-                                            href={meetingLink}
+                                            href={personalLink || meetingLink}
                                         >
                                             <i
                                                 style={style.buttonIcon}
@@ -129,6 +143,12 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
                                             />
                                             {'JOIN MEETING'}
                                         </a>
+                                        &nbsp;
+                                        <CopyToClipboard onCopy={()=>{alert('Meeting Link copied!');}} text={meetingLink}>
+                                            <button className='btn btn-lg btn-primary' style={style.button}>
+                                                {'COPY LINK'}
+                                            </button>
+                                        </CopyToClipboard>
                                     </div>
                                     {this.renderUntilDate(post, style)}
                                 </div>

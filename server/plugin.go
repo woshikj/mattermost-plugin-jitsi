@@ -1,10 +1,15 @@
 package main
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -49,6 +54,32 @@ func (p *Plugin) OnActivate() error {
 	}
 
 	return nil
+}
+
+type YourlsLinkCreationResponse struct {
+	ShortUrl string `json:"shorturl"`
+}
+
+func shortenUrl(longUrl string) string {
+	timeNowSecs := time.Now().Unix()
+	timeNow := strconv.FormatInt(timeNowSecs, 10)
+
+	hashFunc := md5.New()
+	io.WriteString(hashFunc, timeNow)
+	io.WriteString(hashFunc, "05e2685fc7")
+	hashSig := hex.EncodeToString(hashFunc.Sum(nil))
+
+	reqUrl := "https://sgmeet.heavenlycloud.online/yourls-api.php?timestamp=" + timeNow + "&signature=" + hashSig + "&action=shorturl&format=json&"
+	reqUrl = reqUrl + "url=" + url.QueryEscape(longUrl)
+	res, err := http.Get(reqUrl)
+	if err != nil {
+		panic(err)
+	}
+	defer res.Body.Close()
+	parsedBody := YourlsLinkCreationResponse{}
+	json.NewDecoder(res.Body).Decode(&parsedBody)
+	return parsedBody.ShortUrl
+	//https://sgmeet.heavenlycloud.online/yourls-api.php?signature=05e2685fc7&action=shorturl&format=json&url=https://www.google.com
 }
 
 type User struct {
@@ -151,6 +182,25 @@ func (p *Plugin) startMeeting(user *model.User, channel *model.Channel, meetingI
 	}
 	meetingPersonal := false
 
+	var baseURL string
+	var isJWTEnabled bool
+	var jwtValidPeriod int
+	var jitsiAppID string
+	var jitsiAppSecret string
+	if strings.Contains(p.getConfiguration().TeamID, channel.TeamId) {
+		baseURL = p.getConfiguration().JitsiURL
+		isJWTEnabled = p.getConfiguration().JitsiJWT
+		jwtValidPeriod = p.getConfiguration().JitsiLinkValidTime
+		jitsiAppID = p.getConfiguration().JitsiAppID
+		jitsiAppSecret = p.getConfiguration().JitsiAppSecret
+	} else {
+		baseURL = p.getConfiguration().JitsiURL2
+		isJWTEnabled = p.getConfiguration().JitsiJWT2
+		jwtValidPeriod = p.getConfiguration().JitsiLinkValidTime2
+		jitsiAppID = p.getConfiguration().JitsiAppID2
+		jitsiAppSecret = p.getConfiguration().JitsiAppSecret2
+	}
+
 	if len(meetingTopic) < 1 {
 		userConfig, err := p.getUserConfig(user.Id)
 		if err != nil {
@@ -179,30 +229,30 @@ func (p *Plugin) startMeeting(user *model.User, channel *model.Channel, meetingI
 			meetingID = generateEnglishTitleName()
 		}
 	}
-	jitsiURL := strings.TrimSpace(p.getConfiguration().JitsiURL)
+	jitsiURL := strings.TrimSpace(baseURL)
 	jitsiURL = strings.TrimRight(jitsiURL, "/")
 	meetingURL := jitsiURL + "/" + meetingID
-	meetingLink := meetingURL
+	//meetingLink := meetingURL
 
 	var meetingLinkValidUntil = time.Time{}
-	JWTMeeting := p.getConfiguration().JitsiJWT
+	JWTMeeting := isJWTEnabled
 	var jwtToken string
 
 	if JWTMeeting {
 		// Error check is done in configuration.IsValid()
-		jURL, _ := url.Parse(p.getConfiguration().JitsiURL)
+		jURL, _ := url.Parse(baseURL)
 
-		meetingLinkValidUntil = time.Now().Add(time.Duration(p.getConfiguration().JitsiLinkValidTime) * time.Minute)
+		meetingLinkValidUntil = time.Now().Add(time.Duration(jwtValidPeriod) * time.Minute)
 
 		claims := Claims{}
-		claims.Issuer = p.getConfiguration().JitsiAppID
-		claims.Audience = []string{p.getConfiguration().JitsiAppID}
+		claims.Issuer = jitsiAppID
+		claims.Audience = []string{jitsiAppID}
 		claims.ExpiresAt = jwt.NewNumericDate(meetingLinkValidUntil)
 		claims.Subject = jURL.Hostname()
 		claims.Room = meetingID
 
 		var err2 error
-		jwtToken, err2 = signClaims(p.getConfiguration().JitsiAppSecret, &claims)
+		jwtToken, err2 = signClaims(jitsiAppSecret, &claims)
 		if err2 != nil {
 			return "", err2
 		}
@@ -211,12 +261,16 @@ func (p *Plugin) startMeeting(user *model.User, channel *model.Channel, meetingI
 	}
 	meetingURL = meetingURL + "#config.callDisplayName=\"" + meetingTopic + "\""
 
+	meetingLink := meetingURL
+	shortenUrl := shortenUrl(meetingURL)
+	meetingURL = shortenUrl
+
 	meetingUntil := ""
 	if JWTMeeting {
-		meetingUntil = "Meeting link valid until: " + meetingLinkValidUntil.Format("Mon Jan 2 15:04:05 -0700 MST 2006")
+		meetingUntil = "Meeting link valid until: " + meetingLinkValidUntil.Format("Mon Jan 2 , 15:04:05")
 	}
 
-	meetingTypeString := "Meeting ID"
+	meetingTypeString := "Meeting Link"
 	if meetingPersonal {
 		meetingTypeString = "Personal Meeting ID (PMI)"
 	}
@@ -224,7 +278,7 @@ func (p *Plugin) startMeeting(user *model.User, channel *model.Channel, meetingI
 	slackAttachment := model.SlackAttachment{
 		Fallback: fmt.Sprintf("Video Meeting started at [%s](%s).\n\n[Join Meeting](%s)\n\n%s", meetingID, meetingURL, meetingURL, meetingUntil),
 		Title:    meetingTopic,
-		Text:     fmt.Sprintf("%s: [%s](%s)\n\n[Join Meeting](%s)\n\n%s", meetingTypeString, meetingID, meetingURL, meetingURL, meetingUntil),
+		Text:     fmt.Sprintf("%s: [%s](%s)\n\n[Join Meeting](%s)\n\n%s", meetingTypeString, meetingURL, meetingURL, meetingURL, meetingUntil),
 	}
 
 	post := &model.Post{
@@ -234,7 +288,8 @@ func (p *Plugin) startMeeting(user *model.User, channel *model.Channel, meetingI
 		Props: map[string]interface{}{
 			"attachments":             []*model.SlackAttachment{&slackAttachment},
 			"meeting_id":              meetingID,
-			"meeting_link":            meetingLink,
+			"meeting_link":            meetingURL,
+			"meeting_raw_link":        meetingLink,
 			"jwt_meeting":             JWTMeeting,
 			"meeting_jwt":             jwtToken,
 			"jwt_meeting_valid_until": meetingLinkValidUntil.Unix(),

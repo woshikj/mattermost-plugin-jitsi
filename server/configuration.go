@@ -24,13 +24,20 @@ import (
 // If you add non-reference types to your configuration struct, be sure to rewrite Clone as a deep
 // copy appropriate for your types.
 type configuration struct {
-	JitsiURL           string
-	JitsiJWT           bool
-	JitsiEmbedded      bool
-	JitsiAppID         string
-	JitsiAppSecret     string
-	JitsiLinkValidTime int
-	JitsiNamingScheme  string
+	TeamID              string
+	JitsiURL            string
+	JitsiJWT            bool
+	JitsiAppID          string
+	JitsiAppSecret      string
+	JitsiLinkValidTime  int
+	TeamID2             string
+	JitsiURL2           string
+	JitsiJWT2           bool
+	JitsiAppID2         string
+	JitsiAppSecret2     string
+	JitsiLinkValidTime2 int
+	JitsiEmbedded       bool
+	JitsiNamingScheme   string
 }
 
 // Clone shallow copies the configuration. Your implementation may require a deep copy if

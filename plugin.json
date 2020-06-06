@@ -21,17 +21,18 @@
     "settings_schema": {
         "settings": [
             {
+                "key": "TeamID",
+                "display_name": "Team ID",
+                "type": "text",
+                "help_text": "Get the ID from mysql.",
+                "placeholder": "42g03rgj043gjav"
+            },
+            {
                 "key": "JitsiURL",
                 "display_name": "Jitsi Server URL",
                 "type": "text",
                 "help_text": "The URL for your Jitsi server. For example, https://jitsi.example.com.",
                 "placeholder": "https://jitsi.example.com"
-            },
-            {
-                "key": "JitsiEmbedded",
-                "display_name": "Embed Jitsi video inside Mattermost",
-                "type": "bool",
-                "help_text": "(Experimental) When true, Jitsi video is embedded as a floating window inside Mattermost."
             },
             {
                 "key": "JitsiJWT",
@@ -57,6 +58,51 @@
                 "type": "number",
                 "help_text": "(Optional) The number of minutes from when the meeting link is created to when it becomes invalid. Minimum is 1 minute. Only applies if using JWT authentication for your Jitsi server.",
                 "default": 30
+            },
+            {
+                "key": "TeamID2",
+                "display_name": "Team 2 ID",
+                "type": "text",
+                "help_text": "Get the ID from mysql.",
+                "placeholder": "42g03rgj043gjav"
+            },
+            {
+                "key": "JitsiURL2",
+                "display_name": "Jitsi Server 2 URL",
+                "type": "text",
+                "help_text": "The URL for an on-premise Jitsi server. For example, https://jitsi.example.com.",
+                "placeholder": "https://jitsi.example.com"
+            },
+            {
+                "key": "JitsiJWT2",
+                "display_name": "Use JWT Authentication for Jitsi 2",
+                "type": "bool",
+                "help_text": "(Optional) If your Jitsi server uses JSON Web Tokens (JWT) for authentication, set this value to true."
+            },
+            {
+                "key": "JitsiAppID2",
+                "display_name": "App ID for JWT Authentication 2",
+                "type": "text",
+                "help_text": "(Optional) The App ID used for authentication by the Jitsi server and JWT token generator."
+            },
+            {
+                "key": "JitsiAppSecret2",
+                "display_name": "App Secret for JWT Authentication 2",
+                "type": "text",
+                "help_text": "(Optional) The App Secret used for authentication by the Jitsi server and JWT token generator."
+            },
+            {
+                "key": "JitsiLinkValidTime2",
+                "display_name": "Meeting Link Expiry Time (minutes) 2",
+                "type": "number",
+                "help_text": "(Optional) The number of minutes from when the meeting link is created to when it becomes invalid. Minimum is 1 minute. Only applies if using JWT authentication for your Jitsi server.",
+                "default": 30
+            },
+            {
+                "key": "JitsiEmbedded",
+                "display_name": "Embed Jitsi video inside Mattermost",
+                "type": "bool",
+                "help_text": "(Experimental) When true, Jitsi video is embedded as a floating window inside Mattermost."
             },
             {
                 "key": "JitsiNamingScheme",

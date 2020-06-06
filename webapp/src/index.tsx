@@ -37,8 +37,9 @@ class PluginClass {
             <Icon/>,
             (channel: Channel) => {
                 startMeeting(channel.id)(store.dispatch, store.getState);
+                alert('Creating Meeting Link.');
             },
-            'Start Jitsi Meeting'
+            'Start Video Conference'
         );
         registry.registerPostTypeComponent('custom_jitsi', PostTypeJitsi);
         registry.registerWebSocketEventHandler('custom_jitsi_config_update', () => store.dispatch(loadConfig()));

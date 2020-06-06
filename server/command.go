@@ -9,16 +9,16 @@ import (
 	"github.com/mattermost/mattermost-server/v5/plugin"
 )
 
-const jitsiCommand = "jitsi"
-const commandHelp = `* |/jitsi| - Create a new meeting
-* |/jitsi [topic]| - Create a new meeting with specified topic
-* |/jitsi help| - Show this help text
-* |/jitsi settings| - View your current user settings for the Jitsi plugin
-* |/jitsi settings [setting] [value]| - Update your user settings (see below for options)
+const jitsiCommand = "meet"
+const commandHelp = `* |/` + jitsiCommand + `| - Create a new video conference
+* |/` + jitsiCommand + ` [topic]| - Create a new video conference with specified topic
+* |/` + jitsiCommand + ` help| - Show this help text
+* |/` + jitsiCommand + ` settings| - View your current user settings for the Jitsi plugin
+* |/` + jitsiCommand + ` settings [setting] [value]| - Update your user settings (see below for options)
 
 ###### Jitsi Settings:
-* |/jitsi settings embedded [true/false]|: When true, Jitsi meeting is embedded as a floating window inside Mattermost. When false, Jitsi meeting opens in a new window.
-* |/jitsi settings naming_scheme [words/uuid/mattermost/ask]|: Select how meeting names are generated with one of these options:
+* |/` + jitsiCommand + ` settings embedded [true/false]|: When true, Jitsi meeting is embedded as a floating window inside Mattermost. When false, Jitsi meeting opens in a new window.
+* |/` + jitsiCommand + ` settings naming_scheme [words/uuid/mattermost/ask]|: Select how meeting names are generated with one of these options:
     * |words|: Random English words in title case (e.g. PlayfulDragonsObserveCuriously)
     * |uuid|: UUID (universally unique identifier)
     * |mattermost|: Mattermost specific names. Combination of team name, channel name and random text in public and private channels; personal meeting name in direct and group messages channels.
@@ -39,7 +39,7 @@ func createJitsiCommand() *model.Command {
 	return &model.Command{
 		Trigger:          jitsiCommand,
 		AutoComplete:     true,
-		AutoCompleteDesc: "Start a Jitsi meeting in current channel. Other available commands: help, settings",
+		AutoCompleteDesc: "Start a Video Conference in current channel. Other available commands: help, settings",
 		AutoCompleteHint: "[command]",
 	}
 }
@@ -160,6 +160,7 @@ func (p *Plugin) executeSettingsCommand(c *plugin.Context, args *model.CommandAr
 		default:
 			text = "Invalid `embedded` value, use `true` or `false`."
 			userConfig = nil
+			break
 		}
 	case "naming_scheme":
 		switch parameters[1] {

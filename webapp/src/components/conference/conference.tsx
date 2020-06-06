@@ -54,11 +54,11 @@ export default class Conference extends React.PureComponent<Props, State> {
         const vw = this.getViewportWidth();
         const vh = this.getViewportHeight();
 
-        const url = new URL(post.props.meeting_link);
+        const url = new URL(post.props.meeting_raw_link);
 
         const noSSL = url.protocol === 'http:';
 
-        const domain = url.host;
+        const domain = url.hostname;
         const options = {
             roomName: post.props.meeting_id,
             width: this.state.minimized ? MINIMIZED_WIDTH : vw,
