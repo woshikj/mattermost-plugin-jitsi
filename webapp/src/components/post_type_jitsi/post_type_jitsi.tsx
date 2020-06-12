@@ -1,6 +1,9 @@
 import * as React from 'react';
+import {FormattedMessage} from 'react-intl';
 
 import {Post} from 'mattermost-redux/types/posts';
+import {Theme} from 'mattermost-redux/types/preferences';
+import {ActionResult} from 'mattermost-redux/types/actions';
 
 import Svgs from '../../constants/svgs';
 
@@ -11,13 +14,13 @@ import CopyToClipboard = require("react-copy-to-clipboard");
 
 export type Props = {
     post?: Post,
-    theme: any,
+    theme: Theme,
     creatorName: string,
     useMilitaryTime: boolean,
     meetingEmbedded: boolean,
     actions: {
-        enrichMeetingJwt: (jwt: string) => any,
-        openJitsiMeeting: (post: Post | null, jwt: string | null) => void
+        enrichMeetingJwt: (jwt: string) => Promise<ActionResult>,
+        openJitsiMeeting: (post: Post | null, jwt: string | null) => ActionResult,
     }
 }
 
@@ -63,8 +66,15 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
                 dateStr = date.toString();
                 expired = (date.getTime() - Date.now()) < 0;
             }
-            return expired  ?  (<div style={style.validUntil}>{' Meeting link valid until: '} <b>{'Expired'}</b></div>)
-                            : (<div style={style.validUntil}>{' Meeting link valid until: '} <b>{dateStr}</b></div>);
+            return (
+                <div style={style.validUntil}>
+                    <FormattedMessage
+                        id='jitsi.link-valid-until'
+                        defaultMessage=' Meeting link valid until: '
+                    />
+                    <b>{!expired ? dateStr : "Expired"}</b>
+                </div>
+            );
         }
         return null;
     }
@@ -80,28 +90,53 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
 
         let meetingLink = props.meeting_link;
         let personalLink = props.meeting_link;
-        /*if (this.state.meetingJwt) {
-            meetingLink += '?jwt=' + this.state.meetingJwt;
-        } else if (props.jwt_meeting) {
-            meetingLink += '?jwt=' + (props.meeting_jwt);
-        }*/
+        let meetingLinkName = meetingLink;
+        meetingLink += `#config.callDisplayName="${props.meeting_topic || props.default_meeting_topic}"`;
+
+        const preText = (
+            <FormattedMessage
+                id='jitsi.creator-has-started-a-meeting'
+                defaultMessage='{creator} has started a meeting'
+                values={{creator: this.props.creatorName}}
+            />
+        );
+
+        let subtitle = (
+            <FormattedMessage
+                id='jitsi.meeting-id'
+                defaultMessage='Meeting ID: '
+            />
+        );
         /*let personalLink = props.meeting_raw_link;
         if (personalLink && this.state.meetingJwt) {
             personalLink += '?jwt=' + this.state.meetingJwt;
         } else if (personalLink && props.jwt_meeting && props.meeting_jwt) {
             personalLink += '?jwt=' + props.meeting_jwt;
         }*/
-        if(props.meeting_topic)
-            meetingLink += `#config.callDisplayName="${props.meeting_topic}"`;
+        /*if (this.state.meetingJwt) {
+            meetingLink += '?jwt=' + this.state.meetingJwt;
+        } else if (props.jwt_meeting) {
+            meetingLink += '?jwt=' + (props.meeting_jwt);
+        }*/
+        
+        //const preText = `${this.props.creatorName} has started a meeting`;
 
-        const preText = `${this.props.creatorName} has started a meeting`;
-
-        let subtitle = 'Meeting Link: ';
+        //let subtitle = 'Meeting Link: ';
         if (props.meeting_personal) {
-            subtitle = 'Personal Meeting ID (PMI): ';
+            subtitle = (
+                <FormattedMessage
+                    id='jitsi.personal-meeting-id'
+                    defaultMessage='Personal Meeting ID (PMI): '
+                />
+            );
         }
 
-        let title = 'Video Conference';
+        let title = (
+            <FormattedMessage
+                id='jitsi.default-title'
+                defaultMessage='Jitsi Meeting'
+            />
+        );
         if (props.meeting_topic) {
             title = props.meeting_topic;
         }
@@ -123,7 +158,7 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
                                     onClick={this.openJitsiMeeting}
                                     href={meetingLink}
                                 >
-                                    {meetingLink || props.meeting_id}
+                                    {meetingLinkName || props.meeting_id}
                                 </a>
                             </span>
                             <div>
@@ -135,16 +170,19 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
                                             target='_blank'
                                             rel='noopener noreferrer'
                                             onClick={this.openJitsiMeeting}
-                                            href={personalLink || meetingLink}
+                                            href={/*personalLink ||*/ meetingLink}
                                         >
                                             <i
                                                 style={style.buttonIcon}
                                                 dangerouslySetInnerHTML={{__html: Svgs.VIDEO_CAMERA_3}}
                                             />
-                                            {'JOIN MEETING'}
+                                            <FormattedMessage
+                                                id='jitsi.join-meeting'
+                                                defaultMessage='JOIN MEETING'
+                                            />
                                         </a>
                                         &nbsp;
-                                        <CopyToClipboard onCopy={()=>{alert('Meeting Link copied!');}} text={meetingLink}>
+                                        <CopyToClipboard onCopy={()=>{alert('Meeting Link copied!');}} text={meetingLinkName}>
                                             <button className='btn btn-lg btn-primary' style={style.button}>
                                                 {'COPY LINK'}
                                             </button>

@@ -30,7 +30,7 @@ const manifest = JSON.parse(`
                 "key": "JitsiURL",
                 "display_name": "Jitsi Server URL",
                 "type": "text",
-                "help_text": "The URL for an on-premise Jitsi server. For example, https://jitsi.example.com.",
+                "help_text": "The URL for your Jitsi server. For example, https://jitsi.example.com.",
                 "placeholder": "https://jitsi.example.com",
                 "default": null
             },
@@ -41,6 +41,32 @@ const manifest = JSON.parse(`
                 "help_text": "(Experimental) When true, Jitsi video is embedded as a floating window inside Mattermost.",
                 "placeholder": "",
                 "default": null
+            },
+            {
+                "key": "JitsiNamingScheme",
+                "display_name": "Jitsi Meeting Names",
+                "type": "radio",
+                "help_text": "Select how meeting names are generated.",
+                "placeholder": "",
+                "default": "words",
+                "options": [
+                    {
+                        "display_name": "Random English words in title case (e.g. PlayfulDragonsObserveCuriously)",
+                        "value": "words"
+                    },
+                    {
+                        "display_name": "UUID (universally unique identifier)",
+                        "value": "uuid"
+                    },
+                    {
+                        "display_name": "Mattermost context specific names. Combination of team name, channel name and random text in public and private channels; personal meeting name in direct and group messages channels.",
+                        "value": "mattermost"
+                    },
+                    {
+                        "display_name": "Allow user to select meeting name",
+                        "value": "ask"
+                    }
+                ]
             },
             {
                 "key": "JitsiJWT",
@@ -73,32 +99,6 @@ const manifest = JSON.parse(`
                 "help_text": "(Optional) The number of minutes from when the meeting link is created to when it becomes invalid. Minimum is 1 minute. Only applies if using JWT authentication for your Jitsi server.",
                 "placeholder": "",
                 "default": 30
-            },
-            {
-                "key": "JitsiNamingScheme",
-                "display_name": "Jitsi Meeting Names",
-                "type": "radio",
-                "help_text": "Select how meeting names are generated.",
-                "placeholder": "",
-                "default": "english-titlecase",
-                "options": [
-                    {
-                        "display_name": "Random English words in title case (e.g. PlayfulDragonsObserveCuriously)",
-                        "value": "english-titlecase"
-                    },
-                    {
-                        "display_name": "UUID (universally unique identifier)",
-                        "value": "uuid"
-                    },
-                    {
-                        "display_name": "Mattermost context specific names. Combination of team name, channel name and random text in public and private channels; personal meeting name in direct and group messages channels.",
-                        "value": "mattermost"
-                    },
-                    {
-                        "display_name": "Allow user to select meeting name",
-                        "value": "ask"
-                    }
-                ]
             }
         ]
     }
