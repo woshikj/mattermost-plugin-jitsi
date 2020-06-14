@@ -57,9 +57,9 @@ export default class Conference extends React.PureComponent<Props, State> {
         const vw = this.getViewportWidth();
         const vh = this.getViewportHeight();
 
-        const url = new URL(post.props.meeting_link);
+        const url = new URL(post.props.meeting_raw_link);
 
-        const noSSL = url.protocol === 'http:';
+        const noSSL = !url.protocol.includes('https');
 
         const domain = url.host;
         const options = {
