@@ -12,5 +12,6 @@
   "jitsi.open-in-new-tab": "Open in new tab",
   "jitsi.personal-meeting-id": "Personal Meeting ID (PMI): ",
   "jitsi.meeting-expired": "Expired",
-  "jitsi.meeting-copy-link": "COPY LINK"
+  "jitsi.meeting-copy-link": "COPY LINK",
+  "jitsi.meeting-start": "Start Video Conference"
 }

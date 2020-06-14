@@ -2,6 +2,7 @@
 // See License.txt for license information.
 
 import * as React from 'react';
+import {FormattedMessage} from 'react-intl';
 
 import {Channel} from 'mattermost-redux/types/channels';
 import {Post} from 'mattermost-redux/types/posts';
@@ -42,7 +43,10 @@ class PluginClass {
                 store.dispatch(startMeeting(channel.id));
                 //alert('Creating Meeting Link.');
             },
-            'Start Video Conference'
+            <FormattedMessage
+                id='jitsi.meeting-start'
+                defaultMessage='Start Video Conference'
+            />
         );
         registry.registerPostTypeComponent('custom_jitsi', (props: {post: Post}) => (<I18nProvider><PostTypeJitsi post={props.post}/></I18nProvider>));
         registry.registerWebSocketEventHandler('custom_jitsi_config_update', () => store.dispatch(loadConfig()));
