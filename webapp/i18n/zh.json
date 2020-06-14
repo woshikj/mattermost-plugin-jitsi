@@ -11,5 +11,6 @@
   "jitsi.move-up": "提升",
   "jitsi.open-in-new-tab": "在新標籤頁中打開",
   "jitsi.personal-meeting-id": "個人會議 ID (PMI): ",
-  "jitsi.meeting-expired": "已過期"
+  "jitsi.meeting-expired": "已過期",
+  "jitsi.meeting-copy-link": "複製網址"
 }

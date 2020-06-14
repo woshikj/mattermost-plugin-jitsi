@@ -204,7 +204,10 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
                                         &nbsp;
                                         <CopyToClipboard onCopy={()=>{alert('Meeting Link copied!');}} text={meetingLinkName}>
                                             <button className='btn btn-lg btn-primary' style={style.button}>
-                                                {'COPY LINK'}
+                                                <FormattedMessage
+                                                    id='jitsi.meeting-copy-link'
+                                                    defaultMessage='COPY LINK'
+                                                />
                                             </button>
                                         </CopyToClipboard>
                                     </div>
