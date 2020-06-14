@@ -66,15 +66,35 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
                 dateStr = date.toString();
                 expired = (date.getTime() - Date.now()) < 0;
             }
-            return (
-                <div style={style.validUntil}>
-                    <FormattedMessage
-                        id='jitsi.link-valid-until'
-                        defaultMessage=' Meeting link valid until: '
-                    />
-                    <b>{!expired ? dateStr : "Expired"}</b>
-                </div>
-            );
+            if(expired)
+            {
+                return (
+                    <div style={style.validUntil}>
+                        <FormattedMessage
+                            id='jitsi.link-valid-until'
+                            defaultMessage=' Meeting link valid until: '
+                        />
+                        <b>
+                            <FormattedMessage
+                                id='jitsi.meeting-expired'
+                                defaultMessage='Expired'
+                            />
+                        </b>
+                    </div>
+                );
+            }
+            else
+            {
+                return (
+                    <div style={style.validUntil}>
+                        <FormattedMessage
+                            id='jitsi.link-valid-until'
+                            defaultMessage=' Meeting link valid until: '
+                        />
+                        <b>{dateStr}</b>
+                    </div>
+                );
+            }
         }
         return null;
     }
@@ -134,7 +154,7 @@ export class PostTypeJitsi extends React.PureComponent<Props, State> {
         let title = (
             <FormattedMessage
                 id='jitsi.default-title'
-                defaultMessage='Jitsi Meeting'
+                defaultMessage='Video Conference'
             />
         );
         if (props.meeting_topic) {

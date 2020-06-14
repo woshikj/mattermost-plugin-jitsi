@@ -1,0 +1,15 @@
+{
+  "jitsi.close": "關",
+  "jitsi.creator-has-started-a-meeting": "{creator} 開了會議",
+  "jitsi.default-title": "視頻會議",
+  "jitsi.join-meeting": "加入會議",
+  "jitsi.link-valid-until": "會議網址有效期至: ",
+  "jitsi.maximize": "最大化",
+  "jitsi.meeting-id": "會議 ID: ",
+  "jitsi.minimize": "最小化",
+  "jitsi.move-down": "下移",
+  "jitsi.move-up": "提升",
+  "jitsi.open-in-new-tab": "在新標籤頁中打開",
+  "jitsi.personal-meeting-id": "個人會議 ID (PMI): ",
+  "jitsi.meeting-expired": "已過期"
+}

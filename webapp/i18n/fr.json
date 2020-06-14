@@ -1,7 +1,7 @@
 {
     "jitsi.close": "Fermer",
     "jitsi.creator-has-started-a-meeting": "{creator} a démarré une réunion",
-    "jitsi.default-title": "Réunion Jitsi",
+    "jitsi.default-title": "Réunion par vidéoconférence",
     "jitsi.join-meeting": "REJOINDRE LA RÉUNION",
     "jitsi.link-valid-until": "Le lien de la réunion est valide jusqu'au : ",
     "jitsi.maximize": "Maximiser",
@@ -10,6 +10,7 @@
     "jitsi.move-down": "Déplacer vers le bas",
     "jitsi.move-up": "Déplacer vers le haut",
     "jitsi.open-in-new-tab": "Ouvrir dans un nouvel onglet",
-    "jitsi.personal-meeting-id": "Identifiant de réunion personel (PMI) : "
+    "jitsi.personal-meeting-id": "Identifiant de réunion personel (PMI) : ",
+    "jitsi.meeting-expired": "Au dessus de"
   }
   
